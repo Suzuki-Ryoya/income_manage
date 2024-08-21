@@ -3,7 +3,8 @@ import { Box, Button, Container, Grid, TextField } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "./firebase/Firebase";
+import auth from "./firebase/Firebase";
+import { FirebaseError } from "firebase/app";
 
 export const Auth = () => {
   const [email, setEmail] = useState<string>("");
@@ -11,18 +12,21 @@ export const Auth = () => {
 
   const navigate = useNavigate();
 
-  const Register = (event: any) => {
-    event.preventDefault();
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        console.log(user);
-        navigate("/home");
-      })
-      .catch((error) => {
-        alert(error.message);
-        console.log(error);
-      });
+  const signUp = async () => {
+    try {
+      console.log(auth.currentUser);
+      await createUserWithEmailAndPassword(auth, email, password).then(
+        (userCredential) => {
+          const user = userCredential.user;
+          console.log(user);
+          navigate("/home");
+        }
+      );
+    } catch (e) {
+      if (e instanceof FirebaseError) {
+        console.log(e);
+      }
+    }
   };
 
   const handleChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,7 +74,7 @@ export const Auth = () => {
               <Button
                 fullWidth
                 style={{ margin: "0.5rem", marginBottom: "0.5rem" }}
-                onClick={Register}
+                onClick={signUp}
               >
                 新規登録
               </Button>
