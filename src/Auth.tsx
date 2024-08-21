@@ -1,12 +1,29 @@
 import { Fragment } from "react/jsx-runtime";
 import { Box, Button, Container, Grid, TextField } from "@mui/material";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "./firebase/Firebase";
 
 export const Auth = () => {
-  const [email, setEmail] = useState<String>("");
-  const [password, setPassword] = useState<String>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
 
   const navigate = useNavigate();
+
+  const Register = (event: any) => {
+    event.preventDefault();
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        console.log(user);
+        navigate("/home");
+      })
+      .catch((error) => {
+        alert(error.message);
+        console.log(error);
+      });
+  };
 
   const handleChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log(setEmail(e.currentTarget.value));
@@ -53,6 +70,7 @@ export const Auth = () => {
               <Button
                 fullWidth
                 style={{ margin: "0.5rem", marginBottom: "0.5rem" }}
+                onClick={Register}
               >
                 新規登録
               </Button>
