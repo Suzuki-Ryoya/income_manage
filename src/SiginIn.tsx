@@ -1,27 +1,21 @@
-import { Fragment } from "react/jsx-runtime";
+import React, { Fragment, useState } from "react";
 import { Box, Button, Container, Grid, TextField } from "@mui/material";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import auth from "./firebase/Firebase";
 import { FirebaseError } from "firebase/app";
+import { useNavigate } from "react-router-dom";
 
-export const Auth = () => {
+export const SignIn = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-
   const navigate = useNavigate();
 
-  const signUp = async () => {
+  const handleSignIn = async () => {
     try {
-      console.log(auth.currentUser);
-      await createUserWithEmailAndPassword(auth, email, password).then(
-        (userCredential) => {
-          const user = userCredential.user;
-          console.log(user);
-          navigate("/home");
-        }
-      );
+      const getUser = await signInWithEmailAndPassword(auth, email, password);
+      console.log(getUser);
+      navigate("/home");
+      // navigate("/home", { state: { user: getUser } });
     } catch (e) {
       if (e instanceof FirebaseError) {
         console.log(e);
@@ -30,12 +24,11 @@ export const Auth = () => {
   };
 
   const handleChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(setEmail(e.currentTarget.value));
-    setEmail(e.currentTarget.value);
+    setEmail(e.target.value);
   };
 
   const handleChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.currentTarget.value);
+    setPassword(e.target.value);
   };
 
   return (
@@ -45,7 +38,7 @@ export const Auth = () => {
           <Grid item md={4}></Grid>
           <Grid item md={4}>
             <Grid item md={4}>
-              サインイン
+              ログイン
             </Grid>
             <Box component={"form"}>
               <TextField
@@ -74,9 +67,9 @@ export const Auth = () => {
               <Button
                 fullWidth
                 style={{ margin: "0.5rem", marginBottom: "0.5rem" }}
-                onClick={signUp}
+                onClick={handleSignIn}
               >
-                新規登録
+                ログイン
               </Button>
             </Box>
           </Grid>
